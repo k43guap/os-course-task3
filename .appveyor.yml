@@ -1,0 +1,34 @@
+version: '{build}'
+
+image: Visual Studio 2015
+
+environment:
+  matrix:
+    - COMPILER: msvc15
+      GENERATOR: "Visual Studio 14 2015"
+    - COMPILER: MinGW
+      GENERATOR: "MinGW Makefiles"
+
+configuration:
+  - Release
+
+platform:
+  - Win32
+
+before_build:
+  - mkdir _build
+  - cd _build
+  # Rename sh.exe as sh.exe in PATH interferes with MinGW
+  - rename "C:\Program Files\Git\usr\bin\sh.exe" "sh2.exe"
+  - if [%COMPILER%]==[MinGW] set PATH=C:\MinGW\bin;%PATH%
+  - if [%COMPILER%]==[MinGW] mingw-get update
+  - if [%COMPILER%]==[MinGW] mingw-get install mingw32-gmp
+
+build_script:
+  - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -Dgtest_disable_pthreads=ON ..
+  - cmake --build . --config %CONFIGURATION%
+
+test_script:
+  - cd ..\test
+  - if [%COMPILER%]==[msvc15] ..\_build\test\%CONFIGURATION%\runTests.exe
+  - if [%COMPILER%]==[MinGW] ..\_build\test\runTests.exe

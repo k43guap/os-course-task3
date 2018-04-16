@@ -1,0 +1,8 @@
+ab
+bc
+cde
+ef
+fgh
+gkm
+kmp
+mn
