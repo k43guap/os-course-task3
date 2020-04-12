@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cctype>
 
 std::random_device rd;     // only used once to initialise (seed) engine
 std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
@@ -110,11 +111,12 @@ static bool map_compare(const std::pair<char,int> & p1, const std::pair<char,int
 
 int get_thread_length(std::string str, std::vector< std::string > solution)
 {
-    int interval = 0, interval_length = -1;
+    size_t interval = 0;
+    int interval_length = -1;
     std::map <char, int> interval_stats;
     char c_cur = 0, c_prev = 0;
     // bool is_parallel = (solution.at(interval).length() == 1);
-    for (int i = 0; i < str.length(); ++i) {
+    for (size_t i = 0; i < str.length(); ++i) {
         //
         if (isspace(str.at(i)))
             continue;
@@ -126,7 +128,7 @@ int get_thread_length(std::string str, std::vector< std::string > solution)
             interval_stats[c_cur] += 1;
             continue;
         }
-        else if (interval+1 < solution.size() and solution.at(interval + 1).find(c_cur) != std::string::npos) {
+        else if (interval+1 < solution.size() && solution.at(interval + 1).find(c_cur) != std::string::npos) {
             // all tests passed, can go to the next interval now
             ++interval;
             if (interval_length <= 0) {
@@ -145,7 +147,7 @@ int get_thread_length(std::string str, std::vector< std::string > solution)
 
 bool is_space_char(char c)
 {
-    return std::isspace(static_cast<unsigned char>(c));
+    return std::isspace(static_cast<unsigned char>(c)) != 0;
 }
 
 
@@ -163,9 +165,9 @@ std::vector< std::string > get_interval_contents(std::string output_str, std::ve
     ), output_str.end());
     // find out the length of a thread
     int thread_length = get_thread_length(output_str, solution);
-    int pos = 0;
+    size_t pos = 0;
     // iterate through solution intervals and cut a corresponding portion of output
-    for (int i = 0; i < solution.size(); ++i) {
+    for (size_t i = 0; i < solution.size(); ++i) {
         //
         int interval_length = solution.at(i).length() * thread_length;
         interval_contents.push_back(output_str.substr(pos, interval_length));
@@ -194,10 +196,10 @@ std::string check_sequential(std::string output_str, std::vector< std::string > 
     std::vector< std::string > intervals = split_intervals(lab3_sequential_threads());
     // iterate through all sequential intervals and search for each of them in the output
     std::vector< std::string > results = get_interval_contents(output_str, solution);
-    for (int i = 0; i < intervals.size(); ++i) {
+    for (size_t i = 0; i < intervals.size(); ++i) {
         std::string s1 = intervals.at(i);
         bool interval_found = false;
-        for (int j = 0; j < results.size(); ++j) {
+        for (size_t j = 0; j < results.size(); ++j) {
             std::string s2 = get_unique_chars(results.at(j));
             // if (std::is_permutation(s1.begin(), s1.end(), s2.begin(), s2.end())) {
             if (is_permutation_str(s1, s2)) {
@@ -208,8 +210,8 @@ std::string check_sequential(std::string output_str, std::vector< std::string > 
                 while (pos != std::string::npos) {
                     pos_prev = pos;
                     pos = results.at(j).find(pattern, pos+1);
-                    if ((pos == std::string::npos and pos_prev + s1.length() != results.at(j).length()) 
-                        || (pos != std::string::npos and pos != pos_prev + s1.length())) {
+                    if ((pos == std::string::npos && pos_prev + s1.length() != results.at(j).length()) 
+                        || (pos != std::string::npos && pos != pos_prev + s1.length())) {
                         // extra characters found, report error
                         std::stringstream ss;
                         ss << "Threads in interval " << results.at(j) 
@@ -238,10 +240,10 @@ std::string check_unsynchronized(std::string output_str, std::vector< std::strin
     std::vector< std::string > intervals = split_intervals(lab3_unsynchronized_threads());
     // iterate through all unsynchronized intervals and search for each of them in the output
     std::vector< std::string > results = get_interval_contents(output_str, solution);
-    for (int i = 0; i < intervals.size(); ++i) {
+    for (size_t i = 0; i < intervals.size(); ++i) {
         std::string s1 = intervals.at(i);
         bool interval_found = false;
-        for (int j = 0; j < results.size(); ++j) {
+        for (size_t j = 0; j < results.size(); ++j) {
             std::string s2 = get_unique_chars(results.at(j));
             // if (std::is_permutation(s1.begin(), s1.end(), s2.begin(), s2.end())) {
             if (is_permutation_str(s1, s2)) {
@@ -250,7 +252,7 @@ std::string check_unsynchronized(std::string output_str, std::vector< std::strin
                 std::string sequence, prev_sequence;
                 bool is_unsync = false;
                 // check that threads on the interval are unsynchronized
-                while (!is_unsync and pos < results.at(j).length()) {
+                while (!is_unsync && pos < results.at(j).length()) {
                     prev_sequence = sequence;
                     sequence = results.at(j).substr(pos, step);
                     pos += step;
@@ -317,6 +319,7 @@ TEST(lab3_tests, threadsync) {
 //    std::cout << solution_len << std::endl;
 
 //    std::cout << "Running tests for lab3 ..." << std::endl;
+    
     std::stringstream outs;
     std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
     std::cout.rdbuf(outs.rdbuf()); //redirect std::cout to out.txt!
@@ -340,12 +343,12 @@ TEST(lab3_tests, threadsync) {
     EXPECT_EQ(results.size(), solution.size()) << "Invalid number of intervals. Expected " << solution.size() << " intervals, but found " << results.size() << ". Did you forget to run some threads? Otherwise maybe your threads are running for too long (or too short)?";
     std::map <char, int> interval_stats;
     bool is_parallel = false;
-    for (int i = 0; i < results.size(); ++i) {
+    for (size_t i = 0; i < results.size(); ++i) {
         // if i-th interval consists of just one thread, do not check for parallelism
         is_parallel = (solution.at(i).length() == 1);
-        for (int j = 0; j < results.at(i).length(); ++j) {
+        for (size_t j = 0; j < results.at(i).length(); ++j) {
             // check if this thread is running not for the first time during current interval
-            if (j > 0 and results.at(i).at(j) != results.at(i).at(j-1) and interval_stats[results.at(i).at(j)] > 0)
+            if (j > 0 && results.at(i).at(j) != results.at(i).at(j-1) && interval_stats[results.at(i).at(j)] > 0)
                 is_parallel = true;
             // update character counter
             interval_stats[results.at(i).at(j)] += 1;
@@ -356,7 +359,7 @@ TEST(lab3_tests, threadsync) {
         }
         EXPECT_TRUE(is_parallel) << "It seems that your threads are not running in parallel. "
                                  << "Check the '" << solution.at(i) << "' interval";
-        for (int j = 0; j < solution.at(i).length(); ++j) {
+        for (size_t j = 0; j < solution.at(i).length(); ++j) {
             EXPECT_GT(
                     interval_stats[solution.at(i).at(j)],
                     0
@@ -413,7 +416,7 @@ TEST(lab3_tests, concurrency) {
             unsynchronized_failed = true;
         }
         // EXPECT_EQ(unsynchronized_err.length(), 0) << unsynchronized_err << std::endl << "Output is: " << outs.str();
-        if (sequential_err.length() > 0 or unsynchronized_err.length() > 0)
+        if (sequential_err.length() > 0 || unsynchronized_err.length() > 0)
             err_messages.push_back(err_ss.str());
     }
     EXPECT_TRUE(is_random) << "It seems that there is no real concurrency going on. "
@@ -440,3 +443,4 @@ int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
