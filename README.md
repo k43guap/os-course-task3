@@ -72,7 +72,7 @@ aaadcbdcbdcbeeddde
 | 10 | 10 | dghi | bcde |
 | 11 | 11 | bcde | deg |
 | 12 | 12 | defg | ghi |
-| 13 | 13 | cef | him |
+| 13 | 13 | cdef | him |
 | 14 | 14 | cde | pkm |
 | 15 | 15 | bcdgh | emn |
 | 16 | 16 | bcef | ehi |
