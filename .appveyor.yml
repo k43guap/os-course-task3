@@ -20,9 +20,10 @@ before_build:
   - cd _build
   # Rename sh.exe as sh.exe in PATH interferes with MinGW
   - rename "C:\Program Files\Git\usr\bin\sh.exe" "sh2.exe"
-  - if [%COMPILER%]==[MinGW] set PATH=C:\MinGW\bin;%PATH%
-  - if [%COMPILER%]==[MinGW] mingw-get update
-  - if [%COMPILER%]==[MinGW] mingw-get install mingw32-gmp
+  - if [%COMPILER%]==[MinGW] set PATH=C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH%
+  # - if [%COMPILER%]==[MinGW] set PATH=C:\MinGW\bin;%PATH%
+  # - if [%COMPILER%]==[MinGW] mingw-get update
+  # - if [%COMPILER%]==[MinGW] mingw-get install mingw32-gmp
 
 build_script:
   - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -Dgtest_disable_pthreads=ON ..
