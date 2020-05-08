@@ -166,15 +166,17 @@ std::vector< std::string > get_interval_contents(std::string output_str, std::ve
     // find out the length of a thread
     int thread_length = get_thread_length(output_str, solution);
     size_t pos = 0;
-    // iterate through solution intervals and cut a corresponding portion of output
-    for (size_t i = 0; i < solution.size(); ++i) {
-        //
-        int interval_length = solution.at(i).length() * thread_length;
-        interval_contents.push_back(output_str.substr(pos, interval_length));
-        pos += interval_length;
+    if (thread_length > 0) {
+        // iterate through solution intervals and cut a corresponding portion of output
+        for (size_t i = 0; i < solution.size(); ++i) {
+            //
+            int interval_length = solution.at(i).length() * thread_length;
+            interval_contents.push_back(output_str.substr(pos, interval_length));
+            pos += interval_length;
+        }
+        if (pos < output_str.length())
+            interval_contents.push_back(output_str.substr(pos, std::string::npos));
     }
-    if (pos < output_str.length())
-        interval_contents.push_back(output_str.substr(pos, std::string::npos));
     return interval_contents;
 }
 
@@ -418,6 +420,9 @@ TEST(lab3_tests, concurrency) {
         // EXPECT_EQ(unsynchronized_err.length(), 0) << unsynchronized_err << std::endl << "Output is: " << outs.str();
         if (sequential_err.length() > 0 || unsynchronized_err.length() > 0)
             err_messages.push_back(err_ss.str());
+        // be verbose about what is going on
+        if (i % 20 == 0)
+            std::cout << "Completed " << i << " out of 100 runs." << std::endl;
     }
     EXPECT_TRUE(is_random) << "It seems that there is no real concurrency going on. "
                            << "Either fix the code or try the test again.";
