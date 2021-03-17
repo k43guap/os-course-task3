@@ -185,9 +185,9 @@ bool is_permutation_str(std::string s1, std::string s2)
 {
     // make sure this runs with C++11 only
     if (s1.length() > s2.length())
-        return std::is_permutation(s1.begin(), s1.end(), s2.begin());
+        return std::is_permutation(s1.begin(), s1.end(), s2.begin(), s2.end());
     else
-        return std::is_permutation(s2.begin(), s2.end(), s1.begin());
+        return std::is_permutation(s2.begin(), s2.end(), s1.begin(), s1.end());
 }
 
 
