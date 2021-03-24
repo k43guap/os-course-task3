@@ -13,3 +13,11 @@ add_executable(runTests ../lab3.cpp ../lab3.h tests.cpp)
 
 target_link_libraries(runTests gtest gtest_main)
 target_link_libraries(runTests)
+
+# see https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
+set_target_properties(runTests
+    PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)

@@ -18,7 +18,7 @@ std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in thi
 std::uniform_int_distribution<int> uni_delay(10, 100); // guaranteed unbiased
 std::uniform_int_distribution<int> uni_chance(0, 100); // guaranteed unbiased
 
-#ifdef WIN32
+#if defined WIN32 || defined _WIN32
 #include <windows.h>
 #elif _POSIX_C_SOURCE >= 199309L
 #include <time.h>   // for nanosleep
@@ -183,11 +183,13 @@ std::vector< std::string > get_interval_contents(std::string output_str, std::ve
 
 bool is_permutation_str(std::string s1, std::string s2)
 {
-    // make sure this runs with C++11 only
+    // make sure this runs with C++11 only;
+    // passing end() for the second iterator as fourth argument to std::is_permutation 
+    // is supported starting from c++14 only
     if (s1.length() > s2.length())
-        return std::is_permutation(s1.begin(), s1.end(), s2.begin(), s2.end());
+        return std::is_permutation(s1.begin(), s1.end(), s2.begin());
     else
-        return std::is_permutation(s2.begin(), s2.end(), s1.begin(), s1.end());
+        return std::is_permutation(s2.begin(), s2.end(), s1.begin());
 }
 
 
