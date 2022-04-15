@@ -27,7 +27,7 @@ jobs:
           - compiler: MINGW64
             generator: "MinGW Makefiles"
           - compiler: MSVC
-            generator: "Visual Studio 19 2022"
+            generator: "Visual Studio 17 2022"
 
     steps:
     - uses: actions/checkout@v2
